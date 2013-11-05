@@ -5,15 +5,6 @@
 
 .global 	_start
 
-.extern		__vector_reset
-.extern 	__vector_undefined
-.extern 	__vector_swi
-.extern 	__vector_prefetch_abort
-.extern		__vector_data_abort
-.extern 	__vector_reserved
-.extern 	__vector_irq
-.extern 	__vector_fiq
-
 //interrupt vector
 _start:
 	//ldr 	pc, _vector_reset
@@ -44,3 +35,35 @@ _vector_irq:
 	.word 	__vector_irq
 _vector_fiq:
 	.word 	__vector_fiq
+
+__vector_reset:
+	@ Peri port setup
+	ldr 	r0, =0x70000000
+	orr 	r0, r0, #0x13
+	mcr 	p15, 0, r0, c15, c2, 4
+
+	@ disable watchdog
+	ldr		r0, =0x7e004000
+	ldr 	r1, =0x0
+	str 	r1, [r0]
+
+	@ stack
+	ldr 	sp, =8*1024
+
+	@ initialize clock
+	bl 		clock_init
+
+	@ initialize sdram
+	bl 		sdram_init
+
+	@ copy to sdram
+
+
+
+
+
+
+
+
+
+
